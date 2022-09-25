@@ -1,0 +1,65 @@
+---
+- name: The playbook for version {{ ansible_version.string }} ansible is running.
+  hosts: "{{ inventory | default('all') }}"
+  user: root
+  gather_facts: no
+
+  # 定义变量
+  vars:
+    - ip_address: "{{ inventory_hostname }}"
+    - file_script: "script.sh"
+    - file_output: "nic_info.txt"
+    - temp_locdir: "collection"
+
+  # 执行任务
+  tasks:
+    # 1.安装前置命令
+    - name: Install the command 'lspci'
+      ansible.builtin.apt:
+        name: pciutils
+        state: present
+
+    # 2.下发脚本
+    - name: Push the script file
+      ansible.builtin.copy:
+        src: files/nic.sh
+        dest: "/tmp/{{ file_script }}"
+        owner: root
+        group: root
+        mode: '0755'
+        backup: no
+        force: yes
+
+    # 3.运行脚本
+    - name: Run the script file
+      ansible.builtin.shell:
+        chdir: /tmp
+        cmd: sh {{ file_script }} {{ file_output }}
+
+    # 4.将结果汇集到Ansible Server端
+    - name: Pull the result back to the local
+      ansible.builtin.fetch:
+        src: "/tmp/{{ file_output }}"
+        dest: "{{ temp_locdir }}/{{ ip_address }}/{{ file_output }}"
+        flat: yes
+
+    # 5.删除Hosts受管主机的临时文件
+    - name: Clean up the temporary files
+      ansible.builtin.file:
+        path: "/tmp/{{ item }}"
+        state: absent
+      with_items:
+        - "{{ file_script }}"
+        - "{{ file_output }}"
+
+    # 6.汇集本地结果集
+    - name: Save as csv file.
+      ansible.builtin.shell:
+        cmd: |
+          echo "host-name,nic-info" > result.csv
+          cat {{ temp_locdir }}/*/* >> result.csv
+          rm -rf {{ temp_locdir }}
+      connection: local
+      run_once: true
+
+...

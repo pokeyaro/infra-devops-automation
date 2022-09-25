@@ -1,0 +1,31 @@
+#!/usr/bin/expect
+
+set PORT 22
+
+set USER [lindex $argv 0]
+set HOST [lindex $argv 1]
+set PASSWD [lindex $argv 2]
+
+set timeout -1
+
+spawn sftp -o port=$PORT $USER@$HOST
+
+expect {
+    "(yes/no)"
+    {
+        send "yes\n"
+        exp_continue
+    }
+    "password"
+    {
+        send "$PASSWD\n"
+    }
+}
+
+expect -re "sftp> "
+send "pwd\n"
+
+expect -re "sftp> "
+send "bye\n"
+
+expect eof

@@ -1,0 +1,17 @@
+[dell]
+10.50.11.2  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.50.11.3  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.50.18.2  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.50.18.3  ansible_ssh_port=10022  ansible_ssh_user="root"
+
+[hp]
+10.93.16.2  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.93.16.3  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.96.13.2  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.96.13.3  ansible_ssh_port=10022  ansible_ssh_user="root"
+
+[inspur]
+10.47.90.2  ansible_ssh_port=10022  ansible_ssh_user="root"
+10.47.90.3  ansible_ssh_port=10022  ansible_ssh_user="root"
+
+
